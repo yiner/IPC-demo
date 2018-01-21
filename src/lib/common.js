@@ -1,8 +1,8 @@
 function get_age(strBirthday) {
   var returnAge
-  var birthYear = strBirthday.slice(0, 4)
-  var birthMonth = strBirthday.slice(5, 2)
-  var birthDay = strBirthday.slice(8, 2)
+  var birthYear = strBirthday.substr(0, 4)
+  var birthMonth = strBirthday.substr(5, 2)
+  var birthDay = strBirthday.substr(8, 2)
 
   var d = new Date()
   var nowYear = d.getFullYear()
@@ -46,9 +46,10 @@ function factor_data_init(factor_data) {
   for (let fk in factor_data) {
     if (fk==='birth') {
       factor_data[fk].birth_range = age_to_date(factor_data[fk].age_range.min, factor_data[fk].age_range.max)
-      if (factor_data.age) {
-        factor_data.age.age_range = []
-        age_range_init(factor_data.age.options, factor_data.age.age_range)
+      if (factor_data.age_range) {
+        factor_data.age_range.age_val=0
+        factor_data.age_range.age_range = []
+        age_range_init(factor_data.age_range.options, factor_data.age_range.age_range)
       }
     } else {
       factor_data[fk].display_options = factor_data[fk].options
@@ -78,18 +79,9 @@ function factor_data_init(factor_data) {
         })
       }
     }
-    //factor_data.forEach(e=>{console.log(e)})
-    //factor_data.forEach((f, k) => {
-    //  if (f.related_factor.name) {
-    //    f.related_factor.name.forEach(fn => {
-    //      if (!factor_data[fn].influence_factor) factor_data[fn].influence_factor = []
-    //      factor_data[fn].influence_factor.push(k)
-    //    })
-    //  }
-    //})
   }
 }
-function get_age_select_index(age, age_range) {
+function get_age_range_select_index(age, age_range) {
   if (age < age_range[0][0] || age > age_range[age_range.length-1][1]) return -1
   for (let i = 0; i < age_range.length; i++)
     if (age >= age_range[i][0] && age <= age_range[i][1]) {
@@ -97,4 +89,4 @@ function get_age_select_index(age, age_range) {
     }
 }
 
-export { get_age, factor_data_init, get_age_select_index }
+export { get_age, factor_data_init, get_age_range_select_index }

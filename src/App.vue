@@ -1,78 +1,55 @@
 <template>
-  <div id="preminum-caculate">
+  <div id="premium-calculate">
     <div v-for="(f,k) in factor_data" v-show="f.input_type!=='none'">
       <span>{{f.name}}</span>
       <span>
-        <input v-if="f.input_type==='date'" type="date" :min="f.birth_range.min" :max="f.birth_range.max" v-model="birthday" required>
+        <input id='birth' v-if="f.input_type==='date'" type="date" :min="f.date_range.min" :max="f.date_range.max" v-model="f.selected_index" @change="refresh(f)" required>
         <template v-if="f.input_type==='radio'">
           <template v-for="(v,i) in f.display_options">
-              <input type="radio" :name="k" :id="k+i" :value="i" v-model="f.selected_index">
+            <template v-if="v">
+              <input type="radio" :name="k" :id="k+i" :value="i" v-model="f.selected_index" @click="refresh(f)">
               <label :for="k+i">{{v}}</label>
+            </template>
           </template>
         </template>
         <select v-if="f.input_type==='select'" v-model="f.selected_index" @change="refresh(f)">
             <template v-for="(v,i) in f.display_options">
-            <template v-if="v">
-            <option :value="i" v-if="i===f.selected_index" selected>{{v}}</option>
-            <option :value="i" v-else>{{v}}</option>
+              <template v-if="v">
+                <option :value="i" v-if="i===f.selected_index" selected>{{v}}</option>
+                <option :value="i" v-else>{{v}}</option>
+             </template>
             </template>
-          </template>
-          </select>
+        </select>
+        <template v-if="f.input_type==='static'">{{f.display_options}}</template>
       </span>
     </div>
   </div>
 </template>
 
 <script>
-  import factor_data from './lib/factor_config'
-  import { get_age, get_age_select_index, factor_data_init } from './lib/common'
-
-  const prod_id = 'p10'
-
+  import get_factor_data from './lib/factor_config'
+  const prod_id = 'p40'
   export default {
     data(){
       return {
-        factor_data : factor_data_init(factor_data[prod_id]),
-        birthday    : ''
-      }
-    },
-    watch   : {
-      birthday : function(val) {
-        if (val) {
-          let age = get_age(val)
-          this.age = age
-          this.factor_data.age.selected_index = get_age_select_index(age, this.factor_data.age.age_range)
-          if (this.factor_data.age.selected_index!== -1) this.refresh(this.factor_data.age)
-        }
+        factor_data : get_factor_data(prod_id),
       }
     },
     methods : {
       refresh(factor){
-        if (!factor.influence_factor) return
+        if (!factor.trigger) {
+          console.log(`${factor.name}不触发测算因子更新`)
+          return
+        }
         let _this = this
-        let fif = factor.influence_factor
-        for (let i = 0; i < fif.length; i++) {
-          this.factor_data[fif[i]].display_options = get_display_options(this.factor_data[fif[i]])
-        }
-        function get_display_options(factor) {
-          let rfn = factor.related_factor.name
-          let mapping_index = []
-          let options = factor.related_factor.mapping
-          for (let i = 0; i < rfn.length; i++) {
-            mapping_index.push(_this.factor_data[rfn[i]].selected_index)
-          }
-          for (let i = 0; i < mapping_index.length; i++) {
-            options = options[mapping_index[i]]
-          }
-          for (let i = 0; i < options.length; i++) {
-            if (options[i]) {
-              factor.selected_index = i
-              break
-            }
-          }
-          console.log(`${factor.name}索引值是：${mapping_index}，索引值是：${options}`)
-          return options
-        }
+        let fif = factor.trigger
+        console.log(`${factor.name}触发测算因子更新，重新计算${fif}`)
+        fif.forEach(f => {
+          let related_factor = {}
+          _this.factor_data[f].generate_options.related_factor.forEach(rfn => {related_factor[rfn] = _this.factor_data[rfn].selected_index})
+          _this.factor_data[f].display_options = _this.factor_data[f].generate_options.get_display_options.call(_this.factor_data[f], related_factor)
+          this.refresh(_this.factor_data[f])
+        })
       }
     }
   }

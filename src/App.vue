@@ -7,7 +7,7 @@
         <template v-if="f.input_type==='radio'">
           <template v-for="(v,i) in f.display_options">
             <template v-if="v">
-              <input type="radio" :name="k" :id="k+i" :value="i" v-model="f.selected_index" @click="refresh(f)">
+              <input type="radio" :name="k" :id="k+i" :value="i" v-model="f.selected_index" @change="refresh(f)">
               <label :for="k+i">{{v}}</label>
             </template>
           </template>
@@ -30,6 +30,7 @@
   import get_factor_data from './lib/factor_config'
   const prod_id = 'p40'
   export default {
+    name    : 'premium-calculate',
     data(){
       return {
         factor_data : get_factor_data(prod_id),
@@ -48,7 +49,7 @@
           let related_factor = {}
           _this.factor_data[f].generate_options.related_factor.forEach(rfn => {related_factor[rfn] = _this.factor_data[rfn].selected_index})
           _this.factor_data[f].display_options = _this.factor_data[f].generate_options.get_display_options.call(_this.factor_data[f], related_factor)
-          this.refresh(_this.factor_data[f])
+           this.refresh(_this.factor_data[f])
         })
       }
     }

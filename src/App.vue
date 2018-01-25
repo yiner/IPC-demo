@@ -29,17 +29,27 @@
 
 <script>
   import get_factor_data from './lib/factor_config'
-  import get_premium_func from './lib/premium_config'
+  import get_premium from './lib/premium_config'
   const prod_id = 'p20'
   export default {
-    name    : 'premium-calculate',
+    name     : 'premium-calculate',
     data(){
       return {
         factor_data : get_factor_data(prod_id),
-        premium     : ''
       }
     },
-    methods : {
+    computed : {
+      premium : function() {
+        let args = {}
+        for (let key in this.factor_data) {
+          args[key] = this.factor_data[key].selected_index
+        }
+        console.log(`重新计算保费参数${JSON.stringify(args)}`)
+        return get_premium(prod_id, args)
+      }
+
+    },
+    methods  : {
       refresh(factor){
         if (!factor.trigger) {
           console.log(`${factor.name}不触发测算因子更新`)
@@ -54,21 +64,8 @@
           _this.factor_data[f].display_options = _this.factor_data[f].generate_options.get_display_options.call(_this.factor_data[f], related_factor)
           this.refresh(_this.factor_data[f])
         })
-        console.log(`${factor.name}触发重新计算保费`)
-        this.get_premium(prod_id)
       },
-      get_premium(prod_id){
-        let args = {}
-        for (let key in this.factor_data) {
-          args[key] = this.factor_data[key].selected_index
-        }
-        console.log(`重新计算保费参数${JSON.stringify(args)}`)
-        this.premium = get_premium_func(prod_id, args)
-      }
     },
-    mounted : function() {
-      this.get_premium(prod_id)
-    }
   }
 </script>
 <style>

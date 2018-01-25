@@ -3,7 +3,7 @@ const premium_data_config = {
     args      : ['sex', 'payment_period', 'insurance_period', 'amount', 'age'],
     index     : 'age',
     multi     : 'amount',
-    multiply  : [10, 20, 30, 50, 60, 70, 80, 90, 100],
+    multiply  : [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
     factors   : ['sex', 'payment_period', 'insurance_period'],
     '0-0-0'   : [, , , , , , , , , , , , , , , , , , , ,
                   7, 7, 8, 8, 8, 9, 9, 9, 10, 11,
@@ -18,7 +18,7 @@ const premium_data_config = {
                  37, 38, 40, 41, 42, 44, 45, 47, 48, 50,
                  51, 53, 55, 57, 58, 60, 62, 64, 67, 69,
                  71, 74, 76, 79, 81, 84, 87, 88, 90, 93, 96],
-    '0-0-1-1' : [, , , , , , , , , , , , , , , , , , , ,
+    '0-0-1' : [, , , , , , , , , , , , , , , , , , , ,
                  15, 16, 17, 18, 19, 20, 21, 23, 24, 26,
                  28, 30, 32, 34, 37, 40, 43, 46, 50, 54,
                  59, 64, 70, 77, 84, 93, 102, 113, 125, 138, 152]
@@ -58,8 +58,8 @@ const get_premium = function(pid, selected_index) {
   })
   let factor_index = _factor_index.join('-')
   if (factor_index==='') factor_index = 'any'
-  console.log(factor_index, premium_data[factor_index][selected_index[index]] || '参数对应的费率表不完整', (multiply[selected_index[multi]] || 1))
-  return (premium_data[factor_index][selected_index[index]] || 0)*(multiply[selected_index[multi]] || 1)
+  console.log('因子：'+factor_index, '取值：'+(premium_data[factor_index] && premium_data[factor_index][selected_index[index]] || '参数对应的费率表不完整'), '倍数：'+(multiply[selected_index[multi]] || 1))
+  return (premium_data[factor_index] && premium_data[factor_index][selected_index[index]] || 0)*(multiply[selected_index[multi]] || 1)
 }
 
 

@@ -23,17 +23,20 @@
         <template v-if="f.input_type==='static'">{{f.display_options}}</template>
       </span>
     </div>
+    <div><span>保费</span><span>{{premium}}</span></div>
   </div>
 </template>
 
 <script>
   import get_factor_data from './lib/factor_config'
-  const prod_id = 'p40'
+  import get_premium_func from './lib/premium_config'
+  const prod_id = 'p20'
   export default {
     name    : 'premium-calculate',
     data(){
       return {
         factor_data : get_factor_data(prod_id),
+        premium     : ''
       }
     },
     methods : {
@@ -49,9 +52,22 @@
           let related_factor = {}
           _this.factor_data[f].generate_options.related_factor.forEach(rfn => {related_factor[rfn] = _this.factor_data[rfn].selected_index})
           _this.factor_data[f].display_options = _this.factor_data[f].generate_options.get_display_options.call(_this.factor_data[f], related_factor)
-           this.refresh(_this.factor_data[f])
+          this.refresh(_this.factor_data[f])
         })
+        console.log(`${factor.name}触发重新计算保费`)
+        this.get_premium(prod_id)
+      },
+      get_premium(prod_id){
+        let args = {}
+        for (let key in this.factor_data) {
+          args[key] = this.factor_data[key].selected_index
+        }
+        console.log(`重新计算保费参数${JSON.stringify(args)}`)
+        this.premium = get_premium_func(prod_id, args)
       }
+    },
+    mounted : function() {
+      this.get_premium(prod_id)
     }
   }
 </script>

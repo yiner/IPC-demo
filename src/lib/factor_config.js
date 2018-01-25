@@ -1,4 +1,5 @@
 let factor_config = {
+  //健康人生重大疾病保险(个人版)
   'p10' : {
     sex              : {
       name          : '性别',
@@ -105,6 +106,7 @@ let factor_config = {
       }
     }
   },
+  //海外畅游乐境外旅行保险（豪华型）
   'p30' : {
     birth            : {
       name          : '出生日期',
@@ -176,7 +178,7 @@ let factor_config = {
     age_range        : {
       name             : '年龄区间',
       input_type       : 'static',
-      options          : ['0-30周岁', '31-40周岁', '41-50周岁'],
+      options          : ['20-30周岁', '31-40周岁', '41-50周岁'],
       range            : range_init,
       unit             : '周岁',
       default_index    : 0,

@@ -262,6 +262,109 @@ let factor_config = {
         mapping             : [[1], [1, 2, 3]]
       }
     }
+  },
+  //长安无忧终身保障计划
+  'p50' : {
+    sex              : {
+      name          : '被保险人性别',
+      input_type    : 'radio',
+      options       : ['男', '女'],
+      default_index : 0
+    },
+    birth            : {
+      name          : '被保险人出生日期',
+      input_type    : 'date',
+      date_range    : { min : age_to_date(55), max : get_date_after(new Date(), -28) },
+      default_index : 0
+    },
+    age              : {
+      name             : '被保险人年龄',
+      input_type       : 'none',
+      options          : 0,
+      default_index    : 0,
+      generate_options : {
+        related_factor      : ['birth'],
+        get_display_options : birth_to_age
+      }
+    },
+    age_range        : {
+      name             : '被保险人年龄区间',
+      input_type       : 'none',
+      options          : ['0-35周岁', '36-40周岁', '41-45周岁', '46-50周岁'],//xx-xx周岁
+      default_index    : 0,
+      range            : range_init,
+      unit             : '周岁',
+      generate_options : {
+        related_factor      : ['age'],
+        get_display_options : num_to_range
+      }
+    },
+    applicant_sex    : {
+      name          : '投保人性别',
+      input_type    : 'radio',
+      options       : ['男', '女'],
+      default_index : 0
+    },
+    applicant_birth  : {
+      name          : '投保人出生日期',
+      input_type    : 'date',
+      date_range    : { min : age_to_date(55), max : age_to_date(18) },
+      default_index : 0
+    },
+    applicant_age    : {
+      name             : '投保人年龄',
+      input_type       : 'none',
+      options          : 0,
+      default_index    : 18,
+      generate_options : {
+        related_factor      : ['applicant_birth'],
+        get_display_options : birth_to_age
+      }
+    },
+    amount           : {
+      name             : '保额',
+      input_type       : 'select',
+      options          : ['10万元', '20万元', '30万元', '40万元', '50万元'],
+      default_index    : 0,
+      generate_options : {
+        related_factor      : ['age_range'],
+        get_display_options : use_mapping,
+        mapping             : [
+          ['10万元', '20万元', '30万元', '40万元', '50万元'],
+          ['10万元', '20万元', '30万元', '40万元', '50万元'],
+          ['10万元', '20万元'],
+          ['10万元']
+        ]
+      }
+    },
+    accessory_risk_1 : {
+      name          : '重大疾病',
+      input_type    : 'radio',
+      default_index : 1,
+      options       : ['不投保', '投保']
+    },
+    accessory_risk_2 : {
+      name          : '投保人豁免',
+      input_type    : 'radio',
+      default_index : 0,
+      options       : ['不投保', '投保']
+    },
+    payment_period   : {
+      name             : '缴费年限',
+      input_type       : 'select',
+      options          : ['一次交清', '5年', '10年', '15年', '20年'],
+      default_index    : 4,
+      generate_options : {
+        get_display_options : use_mapping,
+        related_factor      : ['age_range', 'accessory_risk_2'],
+        mapping             : [
+          [['一次交清', '5年', '10年', '15年', '20年'], ['', '5年', '10年', '15年', '20年']],
+          [['一次交清', '', '', '', '20年'], ['', '', '', '', '20年']],
+          [['一次交清', '', '', '', '20年'], ['', '', '', '', '20年']],
+          [['一次交清', '', '', '', '20年'], ['', '', '', '', '20年']]
+        ]
+      }
+    }
   }
 }
 
@@ -287,7 +390,7 @@ function range_init(range_options, unit) {
   return range
 }
 
-//所有generate_display_options方法，传入一个对象参数，内容为调用者的related_factor和对应的selected_index
+//所有generate_display_options方法，传入一个对象参数，为调用者的related_factor和对应的selected_index
 //this指向被调用者所在的factor对象
 //输出为调用者经过计算后的display_options
 function get_end_date(related_factor) {
@@ -309,7 +412,7 @@ function get_how_many_days(related_factor) {
 }
 
 function birth_to_age(related_factor) {
-  var strBirthday = related_factor.birth
+  var strBirthday = related_factor[this.generate_options.related_factor[0]]
   var returnAge
   var birthYear = strBirthday.substr(0, 4)
   var birthMonth = strBirthday.substr(5, 2)

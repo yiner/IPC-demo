@@ -47,7 +47,6 @@
         console.log(`重新计算保费参数${JSON.stringify(args)}`)
         return get_premium(prod_id, args)
       }
-
     },
     methods  : {
       refresh(factor){

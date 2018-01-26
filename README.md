@@ -1,6 +1,8 @@
 # pc-demo
 
-> A Vue.js project
+> 一个通用保费测算因子展示以及保费测算功能，支持各险种的测算因子联动，以及主险和附加险的保费测算功能
+本项目基于vue.js
+
 
 ## Build Setup
 
